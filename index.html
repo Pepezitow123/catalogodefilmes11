@@ -59,7 +59,66 @@
         // splice(indice, 1) remove 1 elemento a partir da posição 'indice'.
         // Isso atualiza o array 'catalogo'.
         catalogo.splice(indice, 1);
+
+        //B REMOCAO DO DOM (Visual)
+        //O metodo .remove() retira o elemento html da visualizacao do usuario
+        elementoDOM.remove();
+
+        // Opcional: Atualiza a mensagem da lista se estiver vazia
+        if (catalogo.length === 0) {
+            listaFilmesContainer.innerHTML = '<p>Nenhum filme cadastrado ainda.</p>';
+           }
+        console.log('Filme no indice" ${indice} removido. (Catálogo atualizado:', catalogo);
+
+    }
+
+    //-------------------------------------------------------
+    // FUNÇAO DE REDERIZAÇAO
+    //-------------------------------------------------------
+    /**
+     * Cria e exibir a estrutura HTML de um filme na lista.   
+    *@param {Object} filme O objeto (titulo, sinopse) do filme.
+    *@param {number} indice Indice atual do filme no array 'catalogo'.
+*/
+        function RenderizarFilme(filme,indice) {
+    // Remover a mensagem inicial se for o primeiro filme
+    if (catalago.length === 1) {
+        listafilmeContainer.innerHTML = '';
+
+    }
+     //A. CRIAÇAO DE ELEMENTOS HTML (document.createElement)
+     // A. CRIAÇÃO DE ELEMENTOS HTML (document.createElement)
+    // Cria a <div> que será o conteiner de cada filme.
+    const filmeDiv = document.createElement('div')
+    filmeDiv.classList.add('filme-item'); // Adiciona uma classe para estilização
+    
+    // Cria o <h3> para o titulo e define seu texto.
+    const tituloH3 = document.createElement('h3');
+    tituloH3.textContent = filme.titulo;
+   
+    // Cria o <p> para a sinopse e define seu texto.
+const sinopsep = document.createElement('p');
+sinopseP.textContent = filme.sinopse;
+
+    // Cria o botão de remoção.
+    const removerBotao = document.createElement('button');
+    removerBotao.textContent = 'Remover';
+    removerBotao.classList.add('btn-remover');
+
+    // B. DEFINIÇÃO DO EVENTO DE REMOÇÃO (addEventListener)
+   // Anexa a função 'removerFilme' ao clique do botão.
+   removerBotao.addEventListener('click'), () => {
+        // Ao clicar, chamamos a função, passando o indice (posição) e a propria <div> (filmeDiv).
+removerFilme (indice, filmeDiv);
+  //C. ANEXAR ELEMENTOS (appendChild)
+  //Monta a estrutura hieraquica:
+
+
         }
+
+
+    }
+        
     </script>
 
     
