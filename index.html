@@ -80,7 +80,7 @@
     *@param {Object} filme O objeto (titulo, sinopse) do filme.
     *@param {number} indice Indice atual do filme no array 'catalogo'.
 */
-        function RenderizarFilme(filme,indice) {
+        function RenderizarFilme(filme,indice) {}
     // Remover a mensagem inicial se for o primeiro filme
     if (catalago.length === 1) {
         listafilmeContainer.innerHTML = '';
@@ -112,12 +112,87 @@ sinopseP.textContent = filme.sinopse;
 removerFilme (indice, filmeDiv);
   //C. ANEXAR ELEMENTOS (appendChild)
   //Monta a estrutura hieraquica:
+ // filmeDiv
+ //  |- tituloH3DIÇÃ
+ //  |- sinopseP
+ //  |- removerBotao
+ filmeDiv.appendChild(tituloH3);
+ filmeDiv.appendChild(sinopseP);
+ filmeDiv.appendChild(removerBota);
+ // D. INSERÇÃO NO DOM FINAL
+ // Adiciona o filme montado (filmeDiv) dentro do conteiner principal na página. 
+ listaFilmesContainer.appendChild(filmeDiv);
+
+// Monta a estrutura hierárquica:
+// filmeDiv
+//  |- tituloH3
+//  |- sinopseP
+//  |- removerBotao
+filmeDiv.appendChild(tituloH3);
+filmeDiv.appendChild(sinopseP);
+filmeDiv.appendChild(removerBotao);
+
+// D. INSERÇÃO NO DOM FINAL
+// Adiciona o filme montado (filmeDiv) dentro do conteiner principal na página.
+listaFilmesContainer.appendChild(filmeDiv);
+                
+//-----------------------------------------------------------------------------
+// FUNÇÃO PRINCIPAL DE ADIÇÃO (MANIPULADOR DO FORMULARIO)
+//-----------------------------------------------------------------------------
+/**
+ * LIDA COM O ENVIO DO FORMULARIO, CAPTURA OS DADOS E SALVA O FILME.
+ * @param{EVENT} EVENTO -O EVEMTO DE ´SUBMIT` DO FORMULARIO.
+ */
+function adicionarFILme(eventos) {
+
+// 3. previne o recarregador da pagina
+// o comporramento padrão de um formulario e recarregar a pagina. o preventDefault() impede isso.
+evemto.preventDefault() 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         }
 
 
     }
+
+
+
+
+
+
         
     </script>
 
