@@ -1,126 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Filmes</title>
-    <link rel="stylesheet" href="style.css">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Filmes - Fase 2: Cadastro Manual Consumo de API</title>
+<link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-    
-    <h1>Catálogo de Filmes</h1>
 
-    <form id="cadastro-filmes">
-        <h2>Adicionar Novo Filme</h2>
-        <div>
-            <label for="titulo">Título do Filme</label>
-            <input type="text" id="titulo" required>
-        </div>
+<h1>Catálogo de Filmes</h1>
 
-        <div>
-            <label for="sinopse">Sinopse:</label>
-            <textarea id="sinopse" required></textarea>
-        </div>
+<form id="cadastro-filme">
+<h2>Adicionar Novo Filme (Busca por API)</h2>
+<div>
+<label for="titulo">Título do Filme:</label>
+<input type="text" id="titulo" required>
+</div>
+<div>
+<label for="sinopse">Sinopse:</label>
+<textarea id="sinopse" required></textarea>
+</div>
 
-        <button type="submit">Adicionar Filme</button>
-    </form>
+<button type="submit">Buscar e Adicionar Filme</button>
+</form>
+<hr>
 
-    <hr>
+<h2>Minha Lista De Filmes</h2>
 
-    <h2>Minha Lista de Filmes</h2>
+<div id="lista-filmes">
+<p>Nenhum filme cadastrado ainda.</p>
+</div>
 
-    <div id="lista-filmes">
-        <p>Nenhum filme cadastrado ainda.</p>
-    </div>
+<script>
+// A CHAVE SECRETA DA API OMDb (Substitua este string pela sua chave real!)
+const API_KEY = '72dcf75a';
 
-    <script>
-        // Array global para armazenar os filmes.
-        const catalogo = [];
+// 1. ARMAZENAMENTO DE DADOS 
+const catalogo = [];
 
-        // Captura os elementos do DOM
-        const form = document.getElementById('cadastro-filmes');
-        const listaFilmesContainer = document.getElementById('lista-filmes');
+// 2. CAPTURA DE ELEMENTOS DO DOM (Document Object Model)
+const form = document.getElementById('cadastro-filme');
+const tituloInput = document.getElementById('titulo');
+const listaFilmesContainer = document.getElementById('lista-filmes');
 
-        // Função de remoção de filme
-        function removerFilme(indice, elementoDOM) {
-            // Remove o filme do array
-            catalogo.splice(indice, 1);
+// ------------------------------------------------------------------
+// // FUNÇÃO DE REMOÇÃO (Mantida da fase 1)
+// ------------------------------------------------------------------
+function removerFilme(indice, elementoDOM) {
+    catalogo.splice(indice, 1);
+    elementoDOM.remove();
 
-            // Remove o filme do DOM
-            elementoDOM.remove();
+    if (catalogo.length  === 0){
+        listaFilmesContainer.innerHTML = '<p>Nenhum filme cadastrado ainda.</p>';
+    }
+}
 
-            // Se a lista ficar vazia, exibe a mensagem
-            if (catalogo.length === 0) {
-                listaFilmesContainer.innerHTML = '<p>Nenhum filme cadastrado ainda.</p>';
-            }
+// -------------------------------------------------------------
+// FUNÇÃO DE RENDERIZAÇÃO (Adaptada para incluir o pôster)
+// -------------------------------------------------------------
+function renderizarFilme(filme, indice) {
+    if (catalogo.length === 1) {
+        listaFilmesContainer.innerHTML = '';
+    }
 
-            console.log(`Filme no índice ${indice} removido. Catálogo atualizado:`, catalogo);
-        }
+    const filmeDiv = document.createElement('div');
+    filmeDiv.classList.add('filme-item');
 
-        // Função de renderização do filme
-        function renderizarFilme(filme, indice) {
-            // Se for o primeiro filme, remove a mensagem inicial
-            if (catalogo.length === 1) {
-                listaFilmesContainer.innerHTML = '';
-            }
+// A. Elemento Imagem (Pôster)
+const imagemPoster = document.createElement('img');
+imagemPoster.src = filme.poster && filme.poster !== 'N/A'
+                   ? filme.poster
+                   : 'https://via,placeholder.com/100x150?text=Poster+Nao+Disponivel';
+imagemPoster.alt = `Pôster do filme ${filme.titulo}`;
+imagemPoster.classList.add('filme-poster');
 
-            // Criação dos elementos HTML
-            const filmeDiv = document.createElement('div');
-            filmeDiv.classList.add('filme-item');
+// B. Elementos de Texto e Info
+const infoDiv = document.createElement('div');
+infoDiv.classList.add('filme-info');
 
-            const tituloH3 = document.createElement('h3');
-            tituloH3.textContent = filme.titulo;
+const tituloH3 = document.createElement('h3');
+tituloH3.textContent = filme.titulo;
 
-            const sinopseP = document.createElement('p');
-            sinopseP.textContent = filme.sinopse;
+const sinopseP = document.createElement('p');
+sinopseP.textContent = filme.sinopse;
 
-            const removerBotao = document.createElement('button');
-            removerBotao.textContent = 'Remover';
-            removerBotao.classList.add('btn-remover');
+const removerBotao = document.createElement('button');
+removerBotao.textContent = 'Remover';
+removerBotao.classList.add('btn-remover');
 
-            // Adiciona o evento de remoção no botão
-            removerBotao.addEventListener('click', () => {
-                removerFilme(indice, filmeDiv);
-            });
+// C. Evento de Remoção
+removerBotao.addEventListener('click', () => {
+    const indiceAtual = catalogo.findIndex(f => f.titulo === filme.titulo);
+    if (indiceAtual > -1) {
+          removerFilme(indiceAtual, filmeDiv);
+    }
+});
 
-            // Adiciona os elementos ao DOM
-            filmeDiv.appendChild(tituloH3);
-            filmeDiv.appendChild(sinopseP);
-            filmeDiv.appendChild(removerBotao);
+// D. Montagem do DOM
+infoDiv.appendChild(tituloH3);
+infoDiv.appendChild(sinopseP);
+infoDiv.appendChild(removerBotao);
 
-            // Adiciona o novo filme à lista na tela
-            listaFilmesContainer.appendChild(filmeDiv);
-        }
+filmeDiv.appendChild(imagemPoster);
+filmeDiv.appendChild(infoDiv);
 
-        // Função para adicionar o filme
-        function adicionarFilme(evento) {
-            evento.preventDefault(); // Impede o recarregamento da página
+listaFilmesContainer.appendChild(filmeDiv);
+}
 
-            // Captura os valores dos campos do formulário
-            const tituloInput = document.getElementById('titulo');
-            const sinopseInput = document.getElementById('sinopse');
+// ----------------------------------------------------------------------------------
+// FUNÇÃO PRINCIPAL DE ADIÇÃO (Assíncrona para a API)
+// ----------------------------------------------------------------------------------
+async function adicionarFilme(evento) {
+    evento.preventDefault();
 
-            // Cria um objeto com as informações do filme
-            const novoFilme = {
-                titulo: tituloInput.value,
-                sinopse: sinopseInput.value
-            };
+const titulo = tituloInput.value.trim();
+if (!titulo) return;
 
-            // Adiciona o filme ao array 'catalogo'
-            catalogo.push(novoFilme);
+const tituloFormatado = encodeURIComponent(titulo);
+const url = `https://www.omdbapi.com/?apikey=${API_KEY}&t=${tituloFormatado}`;
 
-            // Renderiza o novo filme na tela
-            renderizarFilme(novoFilme, catalogo.length - 1);
+try {
+    const resposta = await fetch(url);
+    const dadosDoFilme = await resposta.json();
 
-            // Limpa o formulário
-            form.reset();
-        }
+    if (dadosDoFilme.response === "True") {
 
-        // Escuta o evento de envio do formulário
-        form.addEventListener('submit', adicionarFilme);
+        const novoFilme = {
+            titulo: dadosDoFilme.Title,
+            sinopse: dadosDoFilme.Plot,
+            poster: dadosDoFilme.Poster,
+        };
 
-        console.log("JavaScript carregado. Pronto para iniciar o catálogo!");
-    </script>
-    
+        catalogo.push(novoFilme);
+        renderizarFilme(novoFilme, catalogo.length - 1);
+    }  else{
+        alert(`Filme não encontrado na OMDb: "${titulo}".`);
+    }
+
+} catch (error) {
+    alert('Ocorreu um erro ao tentar buscar o filme na API. Verifique sua chave.');
+    console.error('Erro de Fetch:', error);
+}
+
+form.reset();
+}
+
+// 6. ESCUTANDO O EVENTO DO FORMULÁRIO
+form.addEventListener('submit', adicionarFilme);
+
+</script>
+
 </body>
 </html>
