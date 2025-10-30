@@ -3,38 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo de Filmes - Fase 2: Cadastro Manual Consumo de API</title>
+<title>Catálogo de Filmes - Fase 2</title>
 <link rel="stylesheet" href="style.css">
+
+<style>
+  /* ======== ESTILOS GERAIS ======== */
+  body {
+    background-color: #001f3f; /* Azul escuro */
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  h1, h2 {
+    color: #f0f0f0;
+  }
+
+  form {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+  input {
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    width: 250px;
+    margin-top: 5px;
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #0074D9;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #005fa3;
+  }
+
+  #lista-filmes {
+    margin-top: 20px;
+  }
+
+  .filme-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .filme-poster {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .btn-remover {
+    background-color: #FF4136;
+  }
+
+  .btn-remover:hover {
+    background-color: #d9362f;
+  }
+
+  /* ======== SELETOR DE IDIOMA ======== */
+  #idioma {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #0074D9;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+  }
+</style>
 </head>
 
 <body>
-<h1>Catálogo de Filmes</h1>
+  <!-- SELETOR DE IDIOMA -->
+  <select id="idioma">
+    <option value="pt" selected>Português</option>
+    <option value="en">English</option>
+  </select>
 
-<form id="cadastro-filme">
-  <h2>Adicionar Novo Filme (Busca por API)</h2>
-  <div>
-    <label for="titulo">Título do Filme:</label>
-    <input type="text" id="titulo" required>
+  <h1 id="titulo-principal">Catálogo de Filmes</h1>
+
+  <form id="cadastro-filme">
+    <h2 id="subtitulo">Adicionar Novo Filme (Busca por API)</h2>
+    <div>
+      <label for="titulo" id="label-titulo">Título do Filme:</label><br>
+      <input type="text" id="titulo" required>
+    </div>
+
+    <button type="submit" id="botao-buscar">Buscar e Adicionar Filme</button>
+  </form>
+
+  <hr style="width: 80%; border-color: rgba(255,255,255,0.3);">
+
+  <h2 id="minha-lista">Minha Lista De Filmes</h2>
+  <div id="lista-filmes">
+    <p id="mensagem-vazia">Nenhum filme cadastrado ainda.</p>
   </div>
 
-  <button type="submit">Buscar e Adicionar Filme</button>
-</form>
-
-<hr>
-
-<h2>Minha Lista De Filmes</h2>
-<div id="lista-filmes">
-  <p>Nenhum filme cadastrado ainda.</p>
-</div>
-
 <script>
-// CHAVE DA API OMDb (substitua pela sua chave real)
 const API_KEY = 'dc96c932';
-
-// Armazenamento de dados
 const catalogo = [];
-
-// Captura de elementos do DOM
 const form = document.getElementById('cadastro-filme');
 const tituloInput = document.getElementById('titulo');
 const listaFilmesContainer = document.getElementById('lista-filmes');
@@ -43,13 +132,12 @@ const listaFilmesContainer = document.getElementById('lista-filmes');
 function removerFilme(indice, elementoDOM) {
   catalogo.splice(indice, 1);
   elementoDOM.remove();
-
   if (catalogo.length === 0) {
-    listaFilmesContainer.innerHTML = '<p>Nenhum filme cadastrado ainda.</p>';
+    listaFilmesContainer.innerHTML = '<p id="mensagem-vazia">Nenhum filme cadastrado ainda.</p>';
   }
 }
 
-// Função de renderização (sem sinopse)
+// Renderização
 function renderizarFilme(filme, indice) {
   if (catalogo.length === 1) {
     listaFilmesContainer.innerHTML = '';
@@ -58,7 +146,6 @@ function renderizarFilme(filme, indice) {
   const filmeDiv = document.createElement('div');
   filmeDiv.classList.add('filme-item');
 
-  // Pôster
   const imagemPoster = document.createElement('img');
   imagemPoster.src = filme.poster && filme.poster !== 'N/A'
     ? filme.poster
@@ -66,7 +153,6 @@ function renderizarFilme(filme, indice) {
   imagemPoster.alt = `Pôster do filme ${filme.titulo}`;
   imagemPoster.classList.add('filme-poster');
 
-  // Informações
   const infoDiv = document.createElement('div');
   infoDiv.classList.add('filme-info');
 
@@ -74,10 +160,9 @@ function renderizarFilme(filme, indice) {
   tituloH3.textContent = filme.titulo;
 
   const removerBotao = document.createElement('button');
-  removerBotao.textContent = 'Remover';
+  removerBotao.textContent = idiomaAtual === 'pt' ? 'Remover' : 'Remove';
   removerBotao.classList.add('btn-remover');
 
-  // Evento de remoção
   removerBotao.addEventListener('click', () => {
     const indiceAtual = catalogo.findIndex(f => f.titulo === filme.titulo);
     if (indiceAtual > -1) {
@@ -85,20 +170,17 @@ function renderizarFilme(filme, indice) {
     }
   });
 
-  // Montagem do DOM
   infoDiv.appendChild(tituloH3);
   infoDiv.appendChild(removerBotao);
 
   filmeDiv.appendChild(imagemPoster);
   filmeDiv.appendChild(infoDiv);
-
   listaFilmesContainer.appendChild(filmeDiv);
 }
 
-// Função principal de adição (assíncrona para a API)
+// Função principal de busca
 async function adicionarFilme(evento) {
   evento.preventDefault();
-
   const titulo = tituloInput.value.trim();
   if (!titulo) return;
 
@@ -114,22 +196,63 @@ async function adicionarFilme(evento) {
         titulo: dadosDoFilme.Title,
         poster: dadosDoFilme.Poster
       };
-
       catalogo.push(novoFilme);
       renderizarFilme(novoFilme, catalogo.length - 1);
     } else {
-      alert(`Filme não encontrado na OMDb: "${titulo}".`);
+      alert(idiomaAtual === 'pt'
+        ? `Filme não encontrado na OMDb: "${titulo}".`
+        : `Movie not found in OMDb: "${titulo}".`);
     }
   } catch (error) {
-    alert('Ocorreu um erro ao tentar buscar o filme na API. Verifique sua chave.');
+    alert(idiomaAtual === 'pt'
+      ? 'Ocorreu um erro ao tentar buscar o filme na API.'
+      : 'An error occurred while fetching the movie from API.');
     console.error('Erro de Fetch:', error);
   }
 
   form.reset();
 }
 
-// Escutando o evento do formulário
 form.addEventListener('submit', adicionarFilme);
+
+// ==== TROCA DE IDIOMA ====
+const idiomaSelect = document.getElementById('idioma');
+let idiomaAtual = 'pt';
+
+const textos = {
+  pt: {
+    tituloPrincipal: 'Catálogo de Filmes',
+    subtitulo: 'Adicionar Novo Filme (Busca por API)',
+    labelTitulo: 'Título do Filme:',
+    botaoBuscar: 'Buscar e Adicionar Filme',
+    minhaLista: 'Minha Lista De Filmes',
+    mensagemVazia: 'Nenhum filme cadastrado ainda.'
+  },
+  en: {
+    tituloPrincipal: 'Movie Catalog',
+    subtitulo: 'Add New Movie (API Search)',
+    labelTitulo: 'Movie Title:',
+    botaoBuscar: 'Search and Add Movie',
+    minhaLista: 'My Movie List',
+    mensagemVazia: 'No movies added yet.'
+  }
+};
+
+function atualizarIdioma() {
+  const t = textos[idiomaAtual];
+  document.getElementById('titulo-principal').textContent = t.tituloPrincipal;
+  document.getElementById('subtitulo').textContent = t.subtitulo;
+  document.getElementById('label-titulo').textContent = t.labelTitulo;
+  document.getElementById('botao-buscar').textContent = t.botaoBuscar;
+  document.getElementById('minha-lista').textContent = t.minhaLista;
+  document.getElementById('mensagem-vazia').textContent = t.mensagemVazia;
+}
+
+idiomaSelect.addEventListener('change', () => {
+  idiomaAtual = idiomaSelect.value;
+  atualizarIdioma();
+});
+
 </script>
 </body>
 </html>
