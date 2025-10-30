@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo de Filmes - Fase 2</title>
-<link rel="stylesheet" href="style.css">
+<title>Catálogo de Filmes</title>
 
 <style>
   body {
@@ -51,7 +50,7 @@
 
   #lista-filmes {
     margin-top: 20px;
-    width: 80%;
+    width: 85%;
     text-align: left;
   }
 
@@ -61,7 +60,7 @@
     gap: 15px;
     margin-top: 20px;
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 10px;
+    padding: 15px;
     border-radius: 10px;
   }
 
@@ -81,7 +80,7 @@
   .filme-detalhes {
     font-size: 14px;
     color: #ddd;
-    line-height: 1.5;
+    line-height: 1.6;
     margin-top: 5px;
   }
 
@@ -107,7 +106,7 @@
 </head>
 
 <body>
-  <!-- SELETOR DE IDIOMA -->
+  <!-- Seletor de Idioma -->
   <select id="idioma">
     <option value="pt" selected>Português</option>
     <option value="en">English</option>
@@ -139,7 +138,7 @@ const form = document.getElementById('cadastro-filme');
 const tituloInput = document.getElementById('titulo');
 const listaFilmesContainer = document.getElementById('lista-filmes');
 
-// ===== Função de remoção =====
+// ================== Função de Remoção ==================
 function removerFilme(indice, elementoDOM) {
   catalogo.splice(indice, 1);
   elementoDOM.remove();
@@ -148,7 +147,7 @@ function removerFilme(indice, elementoDOM) {
   }
 }
 
-// ===== Renderização completa =====
+// ================== Renderização do Filme ==================
 function renderizarFilme(filme, indice) {
   if (catalogo.length === 1) listaFilmesContainer.innerHTML = '';
 
@@ -176,7 +175,7 @@ function renderizarFilme(filme, indice) {
     <strong>${idiomaAtual === 'pt' ? 'Diretor:' : 'Director:'}</strong> ${filme.diretor}<br>
     <strong>${idiomaAtual === 'pt' ? 'Elenco:' : 'Cast:'}</strong> ${filme.elenco}<br>
     <strong>${idiomaAtual === 'pt' ? 'Nota IMDb:' : 'IMDb Rating:'}</strong> ${filme.nota}<br><br>
-    <strong>${idiomaAtual === 'pt' ? 'Sinopse:' : 'Plot:'}</strong> ${filme.sinopse}
+    <strong>${idiomaAtual === 'pt' ? 'Sinopse Completa:' : 'Full Synopsis:'}</strong><br> ${filme.sinopse}
   `;
 
   const removerBotao = document.createElement('button');
@@ -197,7 +196,7 @@ function renderizarFilme(filme, indice) {
   listaFilmesContainer.appendChild(filmeDiv);
 }
 
-// ===== Busca detalhada na API =====
+// ================== Busca na API (com sinopse completa) ==================
 async function adicionarFilme(evento) {
   evento.preventDefault();
   const titulo = tituloInput.value.trim();
@@ -231,9 +230,9 @@ async function adicionarFilme(evento) {
     }
   } catch (error) {
     alert(idiomaAtual === 'pt'
-      ? 'Ocorreu um erro ao tentar buscar o filme na API.'
+      ? 'Ocorreu um erro ao buscar o filme na API.'
       : 'An error occurred while fetching the movie.');
-    console.error('Erro de Fetch:', error);
+    console.error('Erro:', error);
   }
 
   form.reset();
@@ -241,7 +240,7 @@ async function adicionarFilme(evento) {
 
 form.addEventListener('submit', adicionarFilme);
 
-// ===== Sistema de idiomas =====
+// ================== Sistema de Idiomas ==================
 const idiomaSelect = document.getElementById('idioma');
 let idiomaAtual = 'pt';
 
