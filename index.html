@@ -56,14 +56,18 @@
 
   #lista-filmes {
     margin-top: 20px;
+    width: 80%;
+    text-align: left;
   }
 
   .filme-item {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 15px;
-    margin-top: 10px;
+    margin-top: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 10px;
   }
 
   .filme-poster {
@@ -71,6 +75,21 @@
     height: 150px;
     object-fit: cover;
     border-radius: 5px;
+  }
+
+  .filme-info {
+    flex: 1;
+  }
+
+  .filme-info h3 {
+    margin-top: 0;
+  }
+
+  .filme-sinopse {
+    font-size: 14px;
+    color: #ddd;
+    margin-top: 5px;
+    line-height: 1.4;
   }
 
   .btn-remover {
@@ -159,6 +178,10 @@ function renderizarFilme(filme, indice) {
   const tituloH3 = document.createElement('h3');
   tituloH3.textContent = filme.titulo;
 
+  const sinopseP = document.createElement('p');
+  sinopseP.textContent = filme.sinopse || (idiomaAtual === 'pt' ? 'Sinopse não disponível.' : 'Synopsis not available.');
+  sinopseP.classList.add('filme-sinopse');
+
   const removerBotao = document.createElement('button');
   removerBotao.textContent = idiomaAtual === 'pt' ? 'Remover' : 'Remove';
   removerBotao.classList.add('btn-remover');
@@ -171,6 +194,7 @@ function renderizarFilme(filme, indice) {
   });
 
   infoDiv.appendChild(tituloH3);
+  infoDiv.appendChild(sinopseP);
   infoDiv.appendChild(removerBotao);
 
   filmeDiv.appendChild(imagemPoster);
@@ -194,7 +218,8 @@ async function adicionarFilme(evento) {
     if (dadosDoFilme.Response === "True") {
       const novoFilme = {
         titulo: dadosDoFilme.Title,
-        poster: dadosDoFilme.Poster
+        poster: dadosDoFilme.Poster,
+        sinopse: dadosDoFilme.Plot
       };
       catalogo.push(novoFilme);
       renderizarFilme(novoFilme, catalogo.length - 1);
@@ -252,7 +277,6 @@ idiomaSelect.addEventListener('change', () => {
   idiomaAtual = idiomaSelect.value;
   atualizarIdioma();
 });
-
 </script>
 </body>
 </html>
