@@ -7,9 +7,8 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-  /* ======== ESTILOS GERAIS ======== */
   body {
-    background-color: #001f3f; /* Azul escuro */
+    background-color: #001f3f;
     color: white;
     font-family: Arial, sans-serif;
     display: flex;
@@ -21,9 +20,7 @@
     flex-direction: column;
   }
 
-  h1, h2 {
-    color: #f0f0f0;
-  }
+  h1, h2 { color: #f0f0f0; }
 
   form {
     background-color: rgba(255, 255, 255, 0.1);
@@ -50,9 +47,7 @@
     cursor: pointer;
   }
 
-  button:hover {
-    background-color: #005fa3;
-  }
+  button:hover { background-color: #005fa3; }
 
   #lista-filmes {
     margin-top: 20px;
@@ -71,25 +66,23 @@
   }
 
   .filme-poster {
-    width: 100px;
-    height: 150px;
+    width: 120px;
+    height: 180px;
     object-fit: cover;
     border-radius: 5px;
   }
 
-  .filme-info {
-    flex: 1;
-  }
+  .filme-info { flex: 1; }
 
   .filme-info h3 {
     margin-top: 0;
   }
 
-  .filme-sinopse {
+  .filme-detalhes {
     font-size: 14px;
     color: #ddd;
+    line-height: 1.5;
     margin-top: 5px;
-    line-height: 1.4;
   }
 
   .btn-remover {
@@ -100,7 +93,6 @@
     background-color: #d9362f;
   }
 
-  /* ======== SELETOR DE IDIOMA ======== */
   #idioma {
     position: absolute;
     top: 20px;
@@ -147,7 +139,7 @@ const form = document.getElementById('cadastro-filme');
 const tituloInput = document.getElementById('titulo');
 const listaFilmesContainer = document.getElementById('lista-filmes');
 
-// Função de remoção
+// ===== Função de remoção =====
 function removerFilme(indice, elementoDOM) {
   catalogo.splice(indice, 1);
   elementoDOM.remove();
@@ -156,11 +148,9 @@ function removerFilme(indice, elementoDOM) {
   }
 }
 
-// Renderização
+// ===== Renderização completa =====
 function renderizarFilme(filme, indice) {
-  if (catalogo.length === 1) {
-    listaFilmesContainer.innerHTML = '';
-  }
+  if (catalogo.length === 1) listaFilmesContainer.innerHTML = '';
 
   const filmeDiv = document.createElement('div');
   filmeDiv.classList.add('filme-item');
@@ -168,7 +158,7 @@ function renderizarFilme(filme, indice) {
   const imagemPoster = document.createElement('img');
   imagemPoster.src = filme.poster && filme.poster !== 'N/A'
     ? filme.poster
-    : 'https://via.placeholder.com/100x150?text=Poster+Nao+Disponivel';
+    : 'https://via.placeholder.com/120x180?text=Sem+Imagem';
   imagemPoster.alt = `Pôster do filme ${filme.titulo}`;
   imagemPoster.classList.add('filme-poster');
 
@@ -176,11 +166,18 @@ function renderizarFilme(filme, indice) {
   infoDiv.classList.add('filme-info');
 
   const tituloH3 = document.createElement('h3');
-  tituloH3.textContent = filme.titulo;
+  tituloH3.textContent = `${filme.titulo} (${filme.ano})`;
 
-  const sinopseP = document.createElement('p');
-  sinopseP.textContent = filme.sinopse || (idiomaAtual === 'pt' ? 'Sinopse não disponível.' : 'Synopsis not available.');
-  sinopseP.classList.add('filme-sinopse');
+  const detalhesDiv = document.createElement('div');
+  detalhesDiv.classList.add('filme-detalhes');
+
+  detalhesDiv.innerHTML = `
+    <strong>${idiomaAtual === 'pt' ? 'Gênero:' : 'Genre:'}</strong> ${filme.genero}<br>
+    <strong>${idiomaAtual === 'pt' ? 'Diretor:' : 'Director:'}</strong> ${filme.diretor}<br>
+    <strong>${idiomaAtual === 'pt' ? 'Elenco:' : 'Cast:'}</strong> ${filme.elenco}<br>
+    <strong>${idiomaAtual === 'pt' ? 'Nota IMDb:' : 'IMDb Rating:'}</strong> ${filme.nota}<br><br>
+    <strong>${idiomaAtual === 'pt' ? 'Sinopse:' : 'Plot:'}</strong> ${filme.sinopse}
+  `;
 
   const removerBotao = document.createElement('button');
   removerBotao.textContent = idiomaAtual === 'pt' ? 'Remover' : 'Remove';
@@ -188,13 +185,11 @@ function renderizarFilme(filme, indice) {
 
   removerBotao.addEventListener('click', () => {
     const indiceAtual = catalogo.findIndex(f => f.titulo === filme.titulo);
-    if (indiceAtual > -1) {
-      removerFilme(indiceAtual, filmeDiv);
-    }
+    if (indiceAtual > -1) removerFilme(indiceAtual, filmeDiv);
   });
 
   infoDiv.appendChild(tituloH3);
-  infoDiv.appendChild(sinopseP);
+  infoDiv.appendChild(detalhesDiv);
   infoDiv.appendChild(removerBotao);
 
   filmeDiv.appendChild(imagemPoster);
@@ -202,25 +197,31 @@ function renderizarFilme(filme, indice) {
   listaFilmesContainer.appendChild(filmeDiv);
 }
 
-// Função principal de busca
+// ===== Busca detalhada na API =====
 async function adicionarFilme(evento) {
   evento.preventDefault();
   const titulo = tituloInput.value.trim();
   if (!titulo) return;
 
   const tituloFormatado = encodeURIComponent(titulo);
-  const url = `https://www.omdbapi.com/?apikey=${API_KEY}&t=${tituloFormatado}`;
+  const url = `https://www.omdbapi.com/?apikey=${API_KEY}&t=${tituloFormatado}&plot=full`;
 
   try {
     const resposta = await fetch(url);
-    const dadosDoFilme = await resposta.json();
+    const dados = await resposta.json();
 
-    if (dadosDoFilme.Response === "True") {
+    if (dados.Response === "True") {
       const novoFilme = {
-        titulo: dadosDoFilme.Title,
-        poster: dadosDoFilme.Poster,
-        sinopse: dadosDoFilme.Plot
+        titulo: dados.Title,
+        ano: dados.Year,
+        genero: dados.Genre,
+        diretor: dados.Director,
+        elenco: dados.Actors,
+        nota: dados.imdbRating,
+        sinopse: dados.Plot,
+        poster: dados.Poster
       };
+
       catalogo.push(novoFilme);
       renderizarFilme(novoFilme, catalogo.length - 1);
     } else {
@@ -231,7 +232,7 @@ async function adicionarFilme(evento) {
   } catch (error) {
     alert(idiomaAtual === 'pt'
       ? 'Ocorreu um erro ao tentar buscar o filme na API.'
-      : 'An error occurred while fetching the movie from API.');
+      : 'An error occurred while fetching the movie.');
     console.error('Erro de Fetch:', error);
   }
 
@@ -240,7 +241,7 @@ async function adicionarFilme(evento) {
 
 form.addEventListener('submit', adicionarFilme);
 
-// ==== TROCA DE IDIOMA ====
+// ===== Sistema de idiomas =====
 const idiomaSelect = document.getElementById('idioma');
 let idiomaAtual = 'pt';
 
